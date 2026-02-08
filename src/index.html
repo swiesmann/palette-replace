@@ -13,15 +13,19 @@
 <main>
     <header>
         <h1>Palette Replace</h1>
-        <p>Replace hex colors in your files with colors from popular palettes</p>
+        <p>Looks for hexadecimal-coded colors (<code>&#35;RRGGBB</code>, <code>&#35;RGB</code> plus transparency) in
+            your plain-text file and replaces all of them with the closest color from a color palette.
+            Your files never leave your computer as this is all done by your browser - no server, no upload, no registration.</p>
     </header>
 
     <section>
-        <label for="file-input">Select a file</label>
+        <h2>1. Pick a file</h2>
+        <label for="file-input">Select a file for color replacement</label>
         <input type="file" id="file-input">
     </section>
 
     <section>
+        <h2>2. Pick a color palette</h2>
         <label for="palette-select">Select a palette</label>
         <select id="palette-select">
             <option value="">Choose a palette...</option>
@@ -29,6 +33,7 @@
     </section>
 
     <section>
+        <h2>3. Go</h2>
         <button id="process-btn" disabled>Replace Colors & Download</button>
     </section>
 

@@ -8,6 +8,52 @@
     <link rel="stylesheet" href="./css/pico-v2.1.1.classless.min.css">
     <link rel="manifest" href="/manifest.webmanifest">
     <title>Palette Replace</title>
+    <style>
+        .wizard-step { display: none; }
+        .wizard-step.active { display: block; }
+
+        nav.breadcrumbs ol {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 2rem 0;
+            display: flex;
+            gap: 0;
+            align-items: center;
+        }
+        nav.breadcrumbs li {
+            color: var(--pico-muted-color);
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            cursor: default;
+        }
+        nav.breadcrumbs li + li::before {
+            content: "›";
+            margin: 0 0.6em;
+            color: var(--pico-muted-color);
+        }
+        nav.breadcrumbs li.done {
+            color: var(--pico-primary);
+            cursor: pointer;
+            text-decoration: underline;
+            text-decoration-style: dotted;
+        }
+        nav.breadcrumbs li.current {
+            color: var(--pico-color);
+            font-weight: bold;
+        }
+
+        .wizard-nav {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        .wizard-nav button[data-action="back"] {
+            --pico-background-color: transparent;
+            --pico-color: var(--pico-primary);
+            --pico-border-color: var(--pico-primary);
+        }
+    </style>
 </head>
 <body>
 <main>
@@ -18,34 +64,42 @@
             Your files never leave your computer as this is all done by your browser - no server, no upload, no registration.</p>
     </header>
 
-    <section>
-        <h2>1. Pick a file</h2>
+    <nav class="breadcrumbs" aria-label="Steps">
+        <ol>
+            <li id="crumb-1" class="current">1. Pick a file</li>
+            <li id="crumb-2">2. Pick a palette</li>
+            <li id="crumb-3">3. Replace</li>
+        </ol>
+    </nav>
+
+    <section id="step-1" class="wizard-step active">
+        <h2>Pick a file</h2>
         <label for="file-input">Select a file for color replacement</label>
         <input type="file" id="file-input">
+        <div class="wizard-nav">
+            <button id="step1-next" disabled>Next →</button>
+        </div>
     </section>
 
-    <section>
-        <h2>2. Pick a color palette</h2>
+    <section id="step-2" class="wizard-step">
+        <h2>Pick a color palette</h2>
         <label for="palette-select">Select a palette</label>
         <select id="palette-select">
             <option value="">Choose a palette...</option>
         </select>
+        <div class="wizard-nav">
+            <button data-action="back" id="step2-back">← Back</button>
+            <button id="step2-next" disabled>Next →</button>
+        </div>
     </section>
 
-    <section>
-        <h2>3. Go</h2>
-        <button id="process-btn" disabled>Replace Colors & Download</button>
-    </section>
-
-    <section>
+    <section id="step-3" class="wizard-step">
+        <h2>Replace colors</h2>
         <p id="status"></p>
-    </section>
-
-    <section>
-        <details>
-            <summary>Preview</summary>
-            <pre id="preview"></pre>
-        </details>
+        <div class="wizard-nav">
+            <button data-action="back" id="step3-back">← Back</button>
+            <button id="process-btn">Replace Colors &amp; Download</button>
+        </div>
     </section>
 </main>
 <script type="module" src="./main.ts"></script>

@@ -76,7 +76,10 @@ function init(): void {
   const paletteSelect = document.getElementById('palette-select') as HTMLSelectElement
   const processBtn = document.getElementById('process-btn') as HTMLButtonElement
   const status = document.getElementById('status') as HTMLElement
-  const preview = document.getElementById('preview') as HTMLPreElement
+const step1Next = document.getElementById('step1-next') as HTMLButtonElement
+  const step2Next = document.getElementById('step2-next') as HTMLButtonElement
+  const step2Back = document.getElementById('step2-back') as HTMLButtonElement
+  const step3Back = document.getElementById('step3-back') as HTMLButtonElement
 
   // Populate palette dropdown
   for (const palette of palettes) {
@@ -88,6 +91,27 @@ function init(): void {
 
   let fileContent = ''
   let fileName = ''
+  let currentStep = 1
+
+  function showStep(step: number): void {
+    for (let i = 1; i <= 3; i++) {
+      const el = document.getElementById(`step-${i}`)!
+      el.classList.toggle('active', i === step)
+
+      const crumb = document.getElementById(`crumb-${i}`)!
+      crumb.classList.remove('current', 'done')
+      if (i === step) crumb.classList.add('current')
+      else if (i < step) crumb.classList.add('done')
+    }
+    currentStep = step
+  }
+
+  // Breadcrumb click: navigate back to done steps
+  for (let i = 1; i <= 3; i++) {
+    document.getElementById(`crumb-${i}`)!.addEventListener('click', () => {
+      if (i < currentStep) showStep(i)
+    })
+  }
 
   fileInput.addEventListener('change', () => {
     const file = fileInput.files?.[0]
@@ -97,31 +121,32 @@ function init(): void {
     const reader = new FileReader()
     reader.onload = (e) => {
       fileContent = e.target?.result as string
-      status.textContent = `Loaded: ${fileName}`
-      preview.textContent = fileContent.slice(0, 500) + (fileContent.length > 500 ? '...' : '')
-      processBtn.disabled = false
+step1Next.disabled = false
     }
     reader.readAsText(file)
   })
 
-  processBtn.addEventListener('click', () => {
-    if (!fileContent) {
-      status.textContent = 'Please select a file first'
-      return
-    }
+  step1Next.addEventListener('click', () => showStep(2))
+  step2Back.addEventListener('click', () => showStep(1))
+  step2Next.addEventListener('click', () => {
+    status.textContent = `File: ${fileName} → Palette: ${paletteSelect.value}`
+    showStep(3)
+  })
+  step3Back.addEventListener('click', () => showStep(2))
 
+  paletteSelect.addEventListener('change', () => {
+    step2Next.disabled = !paletteSelect.value
+  })
+
+  processBtn.addEventListener('click', () => {
     const selectedPalette = palettes.find(p => p.name === paletteSelect.value)
-    if (!selectedPalette) {
-      status.textContent = 'Please select a palette'
-      return
-    }
+    if (!selectedPalette) return
 
     const processedContent = replaceColors(fileContent, selectedPalette)
     const newFileName = fileName.replace(/(\.[^.]+)$/, `-${selectedPalette.name.toLowerCase().replace(/\s+/g, '-')}$1`)
 
     downloadFile(processedContent, newFileName)
     status.textContent = `Downloaded: ${newFileName}`
-    preview.textContent = processedContent.slice(0, 500) + (processedContent.length > 500 ? '...' : '')
   })
 }
 

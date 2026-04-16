@@ -73,23 +73,18 @@ function downloadFile(content: string, filename: string): void {
 
 function init(): void {
   const fileInput = document.getElementById('file-input') as HTMLInputElement
-  const paletteSelect = document.getElementById('palette-select') as HTMLSelectElement
+  const carousel = document.getElementById('palette-carousel') as HTMLDivElement
+  const carouselLeft = document.getElementById('carousel-left') as HTMLButtonElement
+  const carouselRight = document.getElementById('carousel-right') as HTMLButtonElement
   const processBtn = document.getElementById('process-btn') as HTMLButtonElement
   const status = document.getElementById('status') as HTMLElement
-const step1Next = document.getElementById('step1-next') as HTMLButtonElement
+  const step1Next = document.getElementById('step1-next') as HTMLButtonElement
   const step2Back = document.getElementById('step2-back') as HTMLButtonElement
-
-  // Populate palette dropdown
-  for (const palette of palettes) {
-    const option = document.createElement('option')
-    option.value = palette.name
-    option.textContent = palette.name
-    paletteSelect.appendChild(option)
-  }
 
   let fileContent = ''
   let fileName = ''
   let currentStep = 1
+  let selectedPaletteName = ''
 
   function showStep(step: number): void {
     for (let i = 1; i <= 2; i++) {
@@ -97,6 +92,40 @@ const step1Next = document.getElementById('step1-next') as HTMLButtonElement
     }
     currentStep = step
   }
+
+  // Build palette cards
+  for (const palette of palettes) {
+    const card = document.createElement('div')
+    card.className = 'palette-card'
+    card.dataset.name = palette.name
+
+    const nameEl = document.createElement('div')
+    nameEl.className = 'palette-card-name'
+    nameEl.textContent = palette.name
+
+    const swatches = document.createElement('div')
+    swatches.className = 'palette-swatches'
+    for (const color of palette.colors) {
+      const swatch = document.createElement('div')
+      swatch.className = 'palette-swatch'
+      swatch.style.backgroundColor = color
+      swatches.appendChild(swatch)
+    }
+
+    card.appendChild(nameEl)
+    card.appendChild(swatches)
+    card.addEventListener('click', () => {
+      carousel.querySelectorAll('.palette-card').forEach(c => c.classList.remove('selected'))
+      card.classList.add('selected')
+      selectedPaletteName = palette.name
+      processBtn.disabled = false
+    })
+    carousel.appendChild(card)
+  }
+
+  const SCROLL_AMOUNT = 210
+  carouselLeft.addEventListener('click', () => carousel.scrollBy({ left: -SCROLL_AMOUNT, behavior: 'smooth' }))
+  carouselRight.addEventListener('click', () => carousel.scrollBy({ left: SCROLL_AMOUNT, behavior: 'smooth' }))
 
   // Breadcrumb click: navigate back to done steps
   document.getElementById('crumb-1-2')!.addEventListener('click', () => showStep(1))
@@ -109,7 +138,7 @@ const step1Next = document.getElementById('step1-next') as HTMLButtonElement
     const reader = new FileReader()
     reader.onload = (e) => {
       fileContent = e.target?.result as string
-step1Next.disabled = false
+      step1Next.disabled = false
     }
     reader.readAsText(file)
   })
@@ -117,12 +146,8 @@ step1Next.disabled = false
   step1Next.addEventListener('click', () => showStep(2))
   step2Back.addEventListener('click', () => showStep(1))
 
-  paletteSelect.addEventListener('change', () => {
-    processBtn.disabled = !paletteSelect.value
-  })
-
   processBtn.addEventListener('click', () => {
-    const selectedPalette = palettes.find(p => p.name === paletteSelect.value)
+    const selectedPalette = palettes.find(p => p.name === selectedPaletteName)
     if (!selectedPalette) return
 
     const processedContent = replaceColors(fileContent, selectedPalette)

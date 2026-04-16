@@ -77,9 +77,7 @@ function init(): void {
   const processBtn = document.getElementById('process-btn') as HTMLButtonElement
   const status = document.getElementById('status') as HTMLElement
 const step1Next = document.getElementById('step1-next') as HTMLButtonElement
-  const step2Next = document.getElementById('step2-next') as HTMLButtonElement
   const step2Back = document.getElementById('step2-back') as HTMLButtonElement
-  const step3Back = document.getElementById('step3-back') as HTMLButtonElement
 
   // Populate palette dropdown
   for (const palette of palettes) {
@@ -94,7 +92,7 @@ const step1Next = document.getElementById('step1-next') as HTMLButtonElement
   let currentStep = 1
 
   function showStep(step: number): void {
-    for (let i = 1; i <= 3; i++) {
+    for (let i = 1; i <= 2; i++) {
       document.getElementById(`step-${i}`)!.classList.toggle('active', i === step)
     }
     currentStep = step
@@ -102,8 +100,6 @@ const step1Next = document.getElementById('step1-next') as HTMLButtonElement
 
   // Breadcrumb click: navigate back to done steps
   document.getElementById('crumb-1-2')!.addEventListener('click', () => showStep(1))
-  document.getElementById('crumb-1-3')!.addEventListener('click', () => showStep(1))
-  document.getElementById('crumb-2-3')!.addEventListener('click', () => showStep(2))
 
   fileInput.addEventListener('change', () => {
     const file = fileInput.files?.[0]
@@ -120,14 +116,9 @@ step1Next.disabled = false
 
   step1Next.addEventListener('click', () => showStep(2))
   step2Back.addEventListener('click', () => showStep(1))
-  step2Next.addEventListener('click', () => {
-    status.textContent = `File: ${fileName} → Palette: ${paletteSelect.value}`
-    showStep(3)
-  })
-  step3Back.addEventListener('click', () => showStep(2))
 
   paletteSelect.addEventListener('change', () => {
-    step2Next.disabled = !paletteSelect.value
+    processBtn.disabled = !paletteSelect.value
   })
 
   processBtn.addEventListener('click', () => {

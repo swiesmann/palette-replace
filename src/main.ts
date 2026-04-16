@@ -95,23 +95,15 @@ const step1Next = document.getElementById('step1-next') as HTMLButtonElement
 
   function showStep(step: number): void {
     for (let i = 1; i <= 3; i++) {
-      const el = document.getElementById(`step-${i}`)!
-      el.classList.toggle('active', i === step)
-
-      const crumb = document.getElementById(`crumb-${i}`)!
-      crumb.classList.remove('current', 'done')
-      if (i === step) crumb.classList.add('current')
-      else if (i < step) crumb.classList.add('done')
+      document.getElementById(`step-${i}`)!.classList.toggle('active', i === step)
     }
     currentStep = step
   }
 
   // Breadcrumb click: navigate back to done steps
-  for (let i = 1; i <= 3; i++) {
-    document.getElementById(`crumb-${i}`)!.addEventListener('click', () => {
-      if (i < currentStep) showStep(i)
-    })
-  }
+  document.getElementById('crumb-1-2')!.addEventListener('click', () => showStep(1))
+  document.getElementById('crumb-1-3')!.addEventListener('click', () => showStep(1))
+  document.getElementById('crumb-2-3')!.addEventListener('click', () => showStep(2))
 
   fileInput.addEventListener('change', () => {
     const file = fileInput.files?.[0]
